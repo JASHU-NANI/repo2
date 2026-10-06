@@ -1,0 +1,24 @@
+
+name: CI Failure Summary
+
+on:
+  repository_dispatch:
+    types: [ci-failure-analysis]
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write agent analysis to Job Summary
+        env:
+          ANALYSIS: ${{ github.event.client_payload.analysis }}
+          RUN_URL: ${{ github.event.client_payload.run_url }}
+          WORKFLOW: ${{ github.event.client_payload.workflow }}
+          BRANCH: ${{ github.event.client_payload.branch }}
+        run: |
+          {
+            echo "# 🤖 Failure analysis for \`$WORKFLOW\` on \`$BRANCH\`"
+            echo "Original failed run: $RUN_URL"
+            echo
+            printf '%s\n' "$ANALYSIS"
+          } >> "$GITHUB_STEP_SUMMARY"
