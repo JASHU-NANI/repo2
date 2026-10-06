@@ -1,24 +1,47 @@
 
-name: CI Failure Summary
+name: CI
 
 on:
-  repository_dispatch:
-    types: [ci-failure-analysis]
+  push:
+  pull_request:
 
 jobs:
-  summary:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Write agent analysis to Job Summary
-        env:
-          ANALYSIS: ${{ github.event.client_payload.analysis }}
-          RUN_URL: ${{ github.event.client_payload.run_url }}
-          WORKFLOW: ${{ github.event.client_payload.workflow }}
-          BRANCH: ${{ github.event.client_payload.branch }}
+      - uses: actions/checkout@v4
+      - name: "Compile Java (FAILS: syntax error)"
         run: |
-          {
-            echo "# 🤖 Failure analysis for \`$WORKFLOW\` on \`$BRANCH\`"
-            echo "Original failed run: $RUN_URL"
-            echo
-            printf '%s\n' "$ANALYSIS"
-          } >> "$GITHUB_STEP_SUMMARY"
+          cat > Hello.java <<'EOF'
+          public class Hello {
+              public static void main(String[] args) {
+                  System.out.println("Hello"   // missing parenthesis and semicolon
+              }
+          }
+          EOF
+          javac Hello.java
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Run Node test (FAILS: assertion error)"
+        run: |
+          node -e "
+          const assert = require('assert');
+          function total(items) { return items.reduce((a, b) => a + b, 0); }
+          assert.strictEqual(total([1, 2, 3]), 7, 'cart total is wrong');
+          "
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Check deploy config (FAILS: missing secret)"
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          if [ -z "$DEPLOY_TOKEN" ]; then
+            echo "::error::DEPLOY_TOKEN is not configured for this repository"
+            exit 1
+          fi
