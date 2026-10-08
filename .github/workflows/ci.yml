@@ -33,5 +33,5 @@ jobs:
         with:
           repository: ${{ github.repository }}
           run_id: ${{ github.run_id }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
