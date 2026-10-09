@@ -19,7 +19,7 @@ jobs:
 
       - name: "Compile Java"
         run: |
-          javac main.java
+          javac Main.java
 
 
   ai-analysis:
