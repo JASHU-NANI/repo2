@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.ArrayList;
 
-public class Main {
+public class TestingCode {
 
     public static void main(String[] args) {
 

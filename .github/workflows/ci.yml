@@ -19,7 +19,7 @@ jobs:
 
       - name: "Compile Java"
         run: |
-          javac Main.java
+          javac TestinCode.java
 
 
   ai-analysis:
